@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>消除QQ表情游戏</title>
+    <style>
+        body { background:#f1f1f1; font-family:微软雅黑; font-size:16px; user-select: none; }
+        #box { width:800px; height:450px; border:1px solid #066; background:#FFF; margin:20px auto 0; position:relative; top:0; left:0; }
+        #fraction { width:130px; border:1px solid #066; position:relative; top:-1px; left:-152px; background:#FFC; padding:10px; }
+        #fraction p { margin:0; font-family:微软雅黑; font-size:16px; line-height:30px; }
+        #alert { text-align:center; }
+        #qq {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 800px;
+            height: 450px;
+        }
+    </style>
+</head>
+<body>
+<div id="alert">
+    <h2>你的鼠标有多快？</h2>
+    <p>游戏说明：点击“开始游戏”，随机掉下QQ表情，把鼠标划上去，千万别让它掉下去！！<br/>划掉25个算你赢；掉下5个算你输 :)</p>
+    <input type="button" value="开始游戏" />
+</div>
+
+<div id="box">
+    <div id="fraction">
+        <p>得分：0 分</p>
+        <p>失分：0 分</p>
+    </div>
+    <div id="qq"></div>
+</div>
+<script src = "doMove.js"></script>
+<script>
+    (function(){
+        //id
+        function $(id){
+            return typeof id === 'string'?document.getElementById(id):id;
+        };
+        //事件监听兼容性函数
+        function addEvent(ele, type, func) {
+            if(ele.addEventListener){
+                ele.addEventListener(type, func,false);
+            }
+            else if(ele.attachEvent){
+                ele.attachEvent('on'+type,func);
+            }else{
+                ele['on'+type]=func;
+            }
+        } ;
+        //获取元素
+        var box = $('box');
+        var QQ = $('qq');
+        var fraction = $('fraction');
+        var aP = fraction.getElementsByTagName('p');
+        var oAlert = $('alert');
+        var oBtn = oAlert.getElementsByTagName('input')[0];
+
+        function starGame(){
+            oBtn.disabled = true;
+            oBtn.value = '游戏进行中……';
+        }
+
+        addEvent(oBtn,'click', starGame);
+
+        function f(url){
+            var l = url.indexOf('?');
+            if(l!=-1){
+                var obj = {};
+                var arr = url.substring(l+1,url.length).split('&');
+                for(var i = 0; i<arr.length; i++){
+                    obj[arr[i].split('=')[0]] = arr[i].split('=')[1];
+                }
+                return obj;
+            }
+        }
+        console.log(f('http://s.weibo.com/weibo/Aralic?topnav=1&wvr=6'))
+
+    })();
+</script>
+</body>
+</html>

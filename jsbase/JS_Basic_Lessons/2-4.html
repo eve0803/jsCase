@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>自动生成V字型（升级版）</title>
+    <style>
+        #list {
+            padding: 0;
+            margin: 0;
+            margin-top: 10px;
+            list-style: none;
+            position: relative;
+        }
+        #list div {
+            height: 50px;
+            width: 50px; color: #fff;
+            line-height: 50px;
+            text-align: center;
+            font-size: 28px;
+            position: absolute;
+        }
+    </style>
+
+</head>
+<body>
+<input id="btn" type="button" value="会转换方向的v字" />
+<section id="list"></section>
+<script>
+    (function(){
+
+        function render(){
+            var btn=document.getElementById("btn"),
+                    list=document.getElementById("list"),
+                    str = '',
+                    len=5,
+                    left=0,
+                    top=0,
+                    flag = 0;
+                    aColor = ['red', 'green', 'blue'];
+
+            btn.onclick=function(){
+                for(var i=0;i<len;i++){
+                    left = i*50 + 'px';
+                    if (i<len/2) {
+                        top = i*50 + 'px';
+                    } else {
+                        top = (len-i-1)*50 + 'px';
+                    }
+                    str += "<div style='background:" + aColor[i%aColor.length] +";top:"+top +";left:"+left+";'>" +(i+1) + "</div>";
+                }
+                list.innerHTML=str;
+            };
+        }
+        render();
+
+    })();
+</script>
+</body>
+</html>
