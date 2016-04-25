@@ -1,0 +1,280 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        h2,ul,li,p,input { margin: 0; padding: 0; }
+        body { background: #999;}
+        #box { width: 310px; margin: 50px auto 0; background: #f2f2f2; padding: 10px; box-shadow: 5px 5px 5px #333; height: 260px; }
+        #box ul { position: relative; }
+        #box h2 { padding-left: 15px; font-size: 30px;}
+        #box li { overflow: hidden; list-style: none; width: 310px;  height: 50px; line-height: 50px; margin: 4px 0; border: 1px solid #ccc; background: #f1f1f1; }
+        #box li:hover { background: #fff; }
+        #box div { float: left; }
+        #box .title { width: 50px; text-align: right; font-weight: bold; cursor: move; }
+        #box .content { width: 120px; height: 50px; position: relative; padding-left: 20px; vertical-align: middle; }
+        #box .content * { vertical-align: middle; display: inline-block; }
+        #box .content input { display: none; width: 100px; padding: 2px 5px; }
+        #box .active  span { display: none; }
+        #box .active  input { display: inline-block; }
+        #box .control { width: 120px;}
+        #box .control a { display: inline-block; padding: 0px 8px 0px 15px; color: #666; font-size: 12px; text-decoration: none; }
+        #box .edit { background: url(img/edit.png) no-repeat left center;}
+        #box .up { background: url(img/up.png) no-repeat left center;}
+        #box .del { background: url(img/del.png) no-repeat left center;}
+        #box .save { background: url(img/save.png) no-repeat left center;}
+    </style>
+</head>
+<body>
+
+<div id="box">
+    <h2>张利晶</h2>
+    <ul>
+        <li>
+            <div class="title">手机</div>
+            <div class="content">
+                <span>18811145855</span>
+                <input type="text" value="18811145855" />
+            </div>
+            <div class="control">
+                <a href="javascript:;" class="edit">编辑</a>
+                <a href="javascript:;" class="del">删除</a>
+            </div>
+        </li>
+        <li>
+            <div class="title">现居地</div>
+            <div class="content">
+                <span>北京市昌平区</span>
+                <input type="text" value="北京市昌平区" />
+            </div>
+            <div class="control">
+                <a href="javascript:;" class="edit">编辑</a>
+                <a href="javascript:;" class="del">删除</a>
+            </div>
+        </li>
+        <li>
+            <div class="title">Q Q</div>
+            <div class="content">
+                <span>948598111</span>
+                <input type="text" value="948598111" />
+            </div>
+            <div class="control">
+                <a href="javascript:;" class="edit">编辑</a>
+                <a href="javascript:;" class="del">删除</a>
+            </div>
+        </li>
+        <li>
+            <div class="title">邮箱</div>
+            <div class="content">
+                <span>鹅号邮箱</span>
+                <input type="text" value="鹅号邮箱" />
+            </div>
+            <div class="control">
+                <a href="javascript:;" class="edit">编辑</a>
+                <a href="javascript:;" class="del">删除</a>
+            </div>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>
+
+<script>
+
+    var oBox = document.getElementById('box');
+    var oUl = oBox.getElementsByTagName('ul')[0];
+    var aLi = oUl.getElementsByTagName('li');
+    var iLen = aLi.length;
+    var zIndex = 1;
+    var aInput = oUl.getElementsByTagName('input');
+
+    var aEdit = getByClass(oUl, 'a', 'edit');
+    var aDel = getByClass(oUl, 'a', 'del');
+
+    setPos();
+
+    for (var i=0; i<iLen; i++) {
+
+        //实现li的拖拽效果
+        drag(aLi[i]);
+
+        aEdit[i].status = 'edit';
+        //编辑
+        aEdit[i].onclick = function() {
+            if (this.status == 'edit') {
+                aLi[this.index].className = 'active';
+                this.innerHTML = '保存';
+                this.status = this.className = 'save';
+            } else {
+                //把值保存起来
+                aLi[this.index].getElementsByTagName('span')[0].innerHTML = aLi[this.index].getElementsByTagName('input')[0].value;
+                aLi[this.index].className = '';
+                this.innerHTML = '编辑';
+                this.status = this.className = 'edit';
+            }
+        }
+        //删除
+        aDel[i].onclick = function() {
+            //alert(this.index);
+            oUl.removeChild(aLi[this.index]);
+            aEdit.splice(this.index, 1);
+            aDel.splice(this.index, 1);
+            setPos();
+        }
+    }
+
+    for (var i=0; i<aInput.length; i++) {
+        aInput[i].onmousedown = function(ev) {
+            var e = ev || event;
+            e.cancelBubble = true;
+        }
+    }
+
+    function setPos(){ //布局转换
+
+        for(var i=0; i<aLi.length; i++){
+            aLi[i].style.position = '';
+            aLi[i].left = aLi[i].offsetLeft;
+            aLi[i].top = aLi[i].offsetTop;
+            aEdit[i].index = aDel[i].index = i;
+        }
+
+        for(var i=0; i<aLi.length; i++){
+            aLi[i].style.left = aLi[i].left + 'px';
+            aLi[i].style.top = aLi[i].top + 'px';
+            aLi[i].pos = {
+                left: aLi[i].left,
+                top : aLi[i].top
+            }
+            aLi[i].style.position = 'absolute';
+        }
+
+    }
+
+    function getByClass(context, tagname, classname) {
+        var aElements = context.getElementsByTagName(tagname);
+        var result = [];
+
+        for (var i=0; i<aElements.length; i++) {
+            var aClasses = aElements[i].className.split(' ');
+            for (var j=0; j<aClasses.length; j++) {
+                if (aClasses[j] == classname) {
+                    result.push( aElements[i] );
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    function drag(obj) {
+        obj.onmousedown = function(ev) {
+
+            var e = ev || event;
+
+            var targetElement = e.target || e.srcElement;
+            if ( targetElement.tagName == 'INPUT' || targetElement.tagName == 'A' ) {
+                return false;
+            }
+
+            obj.style.zIndex = ++zIndex;
+
+            for (var i=0; i<aLi.length; i++) {
+                aLi[i].style.transition = '';
+            }
+
+            var disX = e.clientX - this.offsetLeft;
+            var disY = e.clientY - this.offsetTop;
+
+            document.onmousemove = function(ev) {
+                var e = ev || event;
+                obj.style.left = e.clientX - disX + 'px';
+                obj.style.top = e.clientY - disY + 'px';
+            }
+
+            document.onmouseup = function() {
+                document.onmousemove = document.onmouseup = null;
+
+                var arr = hit(obj);
+                console.log(arr);
+
+                //有碰撞上的元素
+                if (arr.length) {
+                    var o = getShortElement(obj, arr);
+                    console.log(o);
+
+                    var t = {
+                        left: o.pos.left,
+                        top: o.pos.top
+                    };
+
+                    obj.style.left = t.left + 'px';
+                    obj.style.top = t.top + 'px';
+
+                    o.style.left = obj.pos.left + 'px';
+                    o.style.top = obj.pos.top + 'px';
+
+                    o.pos.left = obj.pos.left;
+                    o.pos.top = obj.pos.top;
+
+                    obj.pos.left = t.left;
+                    obj.pos.top = t.top;
+
+                    o.style.transition = '1s';
+
+                } else {
+                    //没有碰撞的元素，把当前拖拽的元素重置原来的位置
+                    obj.style.left = obj.pos.left + 'px';
+                    obj.style.top = obj.pos.top + 'px';
+                }
+
+                obj.style.transition = '1s';
+
+            }
+
+            return false;
+        }
+    }
+
+    function hit(obj) {
+        var L1 = obj.offsetLeft;
+        var T1 = obj.offsetTop;
+        var R1 = L1 + obj.offsetWidth;
+        var B1 = T1 + obj.offsetHeight;
+
+        var result = [];
+
+        for (var i=0; i<aLi.length; i++) {
+            if (obj != aLi[i]) {
+                var L2 = aLi[i].offsetLeft;
+                var T2 = aLi[i].offsetTop;
+                var R2 = L2 + aLi[i].offsetWidth;
+                var B2 = T2 + aLi[i].offsetHeight;
+
+                if (!(R1 < L2 || B1 < T2 || L1 > R2 || T1 > B2)) {
+                    result.push(aLi[i]);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    function getShortElement(obj, arr) {
+        var temp = 99999;
+        var o = null;
+
+        for (var i=0; i<arr.length; i++) {
+            var v = Math.abs(obj.offsetTop - arr[i].offsetTop);
+            if (v < temp) {
+                temp = v;
+                o = arr[i];
+            }
+        }
+
+        return o;
+    }
+</script>

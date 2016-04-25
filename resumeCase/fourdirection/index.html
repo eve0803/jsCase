@@ -1,0 +1,136 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图片四方向切换</title>
+</head>
+<style>
+    body,html{overflow: hidden;}
+    #box,#box ul,#box ul li,#box ul li img{width: 600px; height:400px;overflow:hidden;}
+    #box{border:3px solid #FEF584;margin:50px auto;}
+    #box ul{margin: 0;padding: 0; position: relative;}
+    #box ul li{position: absolute;top: 0;left: 0;opacity: 1;z-index: 1;}
+    #box li.current{z-index: 10;}
+    #box li.next{z-index: 5;}
+</style>
+<body>
+<div id="box">
+    <ul>
+        <li class='current'><img src="img/007.jpg" alt=""></li>
+        <li class='next'><img src="img/002.jpg" alt=""></li>
+        <li><img src="img/003.jpg" alt=""></li>
+        <li><img src="img/004.jpg" alt=""></li>
+        <li><img src="img/005.jpg" alt=""></li>
+    </ul>
+</div>
+</body>
+</html>
+<script>
+    var oBox=document.getElementById('box');
+    var aLi=oBox.getElementsByTagName('li');
+
+    var iCur=0,iNext=1, onOff=true, index=0;
+
+    var iW=getStyle(aLi[0],'width');
+    var iH=getStyle(aLi[0],'height');
+    var	json={
+        '0':['left',-iW],  //向左
+        '1':['left',iW],  //向右
+        '2':['top',-iH], //向上
+        '3':['top',iH]  //向下
+    }
+    oBox.onmousedown=function(ev){
+        var ev=ev||event;
+        var xs=ev.clientX, ys=ev.clientY;
+
+        document.onmouseup=function(ev){
+            var ev=ev||event;
+            var x=ev.clientX-xs, y=ev.clientY-ys,
+                    iX=Math.abs(x), iY=Math.abs(y);
+
+            document.onmouseup=null;
+            if( iX<5 && iY<5 ) return;
+
+            index=iX>iY?(x<0?0:1):(y<0?2:3);
+            fnMove(json[index][0],json[index][1]);
+
+        }
+
+        return false;
+    }
+    document.onkeydown=function(ev){
+        var ev=ev||event;
+        index=10;
+        switch(ev.keyCode){
+            case 37:
+                index=0;
+                break;
+
+            case 38:
+                index=2;
+                break;
+
+            case 39:
+                index=1;
+                break;
+
+            case 40:
+                index=3;
+                break;
+        }
+        fnMove(json[index][0],json[index][1]);
+    }
+
+
+    function fnMove(attr,target){
+        if(onOff){
+            onOff=false;
+
+            aLi[iCur].className='current';
+            aLi[iNext].className='next';
+
+            doMove ( aLi[iCur], attr, 25, target,function(){
+
+                aLi[iCur].className='';
+                aLi[iCur].style[attr]='0px';
+                aLi[iCur].style.opacity=1;
+
+                iCur++;
+                iNext++;
+                iCur%=aLi.length;
+                iNext%=aLi.length;
+                aLi[iCur].className='current';
+                aLi[iNext].className='next';
+
+                onOff=true;
+            } );
+        }
+    }
+
+
+    function doMove ( obj, attr, dir, target, endFn ) {
+        dir=parseInt(getStyle( obj, attr ))<target?dir:-dir;
+        clearInterval( obj.timer );
+
+        var opa=1;
+
+        obj.timer = setInterval(function () {
+            var speed = parseInt(getStyle( obj, attr )) + dir; // 步长
+            if (speed>target && dir>0||speed<target && dir<0)speed=target;
+            obj.style[attr]=speed+'px';
+
+            opa-=1/30;
+            obj.style.opacity=opa;
+
+            if ( speed == target ) {
+                clearInterval( obj.timer );
+                if( typeof endFn === 'function')endFn();
+            }
+
+        }, 20);
+    }
+
+    function getStyle ( obj, attr ) {
+        return obj.currentStyle?parseInt(obj.currentStyle[attr]) : parseInt(getComputedStyle( obj )[attr]);
+    }
+</script>

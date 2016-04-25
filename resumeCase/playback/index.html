@@ -1,0 +1,113 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>拖拽回放</title>
+    <style>
+        body,input,p{margin: 0;padding: 0;}
+        #btn {width: 50px;height: 50px; position: absolute;right: 100px;top: 20px; z-index: 10;}
+        #div1 {width: 256px;height: 256px;backgro-und: orange;background: url("img/mb.jpg"); position: absolute;left: 0;top: 0; z-index: 5;}
+        span{color: #2C7EA2; position: absolute;}
+    </style>
+</head>
+<body>
+<input id="btn" type="button" value='回放' />
+<div id="div1"></div>
+<div id='div2'></div>
+</body>
+</html>
+<script>
+    var oBtn = document.getElementById('btn'),
+            oDiv1 = document.getElementById('div1'),
+            oDiv2 = document.getElementById('div2'),
+            arrTop = [],
+            arrLeft = [],
+            arrSpan = [],
+            onOff = true;
+
+    drag( oDiv1 );
+
+    oBtn.onclick=function(){
+
+        if( !onOff ) return;
+        onOff = false;
+        var aSpan = document.getElementsByTagName('span');
+
+        var i = 0;
+        arrLeft.reverse();
+        arrTop.reverse();
+        arrSpan.reverse();
+
+        oBtn.timer = setInterval(function(){
+            if(arrLeft.length){
+
+                oDiv1.style.left = arrLeft[i] + 'px';
+                oDiv1.style.top = arrTop[i] + 'px';
+                oDiv2.removeChild( arrSpan[i] );
+
+                i++;
+            }
+
+            if( i == arrLeft.length ){
+                clearInterval( oBtn.timer );
+                onOff = true;
+                arrLeft = [];
+                arrTop = [];
+                arrSpan = [];
+            }
+
+        },10)
+
+    }
+
+    function drag( obj ){
+
+        obj.onmousedown = function(ev){
+
+            var ev = ev || event;
+
+
+            var disX = ev.clientX - obj.offsetLeft;
+            var disY = ev.clientY - obj.offsetTop;
+
+            if( obj.setCapture ) obj.setCapture();
+
+            document.onmousemove = function(ev){
+
+                var ev = ev || event;
+
+                var l = ev.clientX - disX;
+                var t = ev.clientY - disY;
+
+                obj.style.left = l + 'px';
+                obj.style.top = t + 'px';
+
+                //拖拽路径线
+                var oSpan = document.createElement('span');
+                oSpan.innerHTML = '●';
+                oSpan.style.left = l + 21 + 'px';
+                oSpan.style.top = t + 216 + 'px';
+
+                oDiv2.appendChild( oSpan );
+
+                arrSpan.push( oSpan );
+
+                //存储拖拽路径点
+                arrLeft.push( l );
+                arrTop.push( t );
+
+            };
+
+
+            document.onmouseup = function(){
+
+                if( obj.releaseCapture ) obj.releaseCapture();
+                document.onmousemove = document.onmouseup = null;
+            };
+
+            return false;
+        };
+
+    }
+
+</script>

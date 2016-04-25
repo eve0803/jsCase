@@ -1,0 +1,91 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>依次进场练习</title>
+</head>
+<style type="text/css">
+    img{width: 70px;height: 70px; position: absolute;top: 20px; left: 0; transition:1s top; border-radius: 50%; padding:2px; border: 1px solid #ccc;}
+</style>
+<body>
+<script type="text/javascript">
+    var str='';
+    var len=10;
+    var arrImg=['img/h/2.jpg','img/h/11.jpg','img/h/4.jpg','img/h/19.jpg','img/h/21.jpg'];
+    for(var i=0;i<len;i++){
+        str+='<img src="'+arrImg[i%arrImg.length]+'" style="left:'+i*80+'px" />';
+    }
+    document.body.innerHTML=str;
+    var aImg=document.getElementsByTagName('img');
+    var timer=0;
+    var onOff=true;
+    document.onclick=function(){
+        //var timer放外面，每次点击运行一个定时器，只能关一个，所以会影响。。
+        //把var timer放里面，形成闭包，可多次点击，多个定时器之间不受影响，最终都会关闭。
+        //设置开关，定时器运行中，只可点击一次。。
+        //-------------------设置开关----------------------------------------
+        if(onOff){
+            onOff=false;
+
+            var num=0,m=0,a=0,b=0;
+
+            timer=setInterval(function(){
+                //document.title = m;
+                shake(aImg[num],'top',10,function(){
+                    shake(aImg[m],'left',10,function(){
+                        aImg[a].style.top = 500 + 'px';
+                        a++;
+
+                        if(aImg[len-1].style.top=='500px'){
+                            fn1();
+                            function fn1(){
+                                setTimeout(function(){
+                                    aImg[b].style.top = 0;
+                                    b++;
+                                    if(b<len){fn1();}  //b会一直增加，限制个数
+                                    else{onOff=true;}	//设置自动走完可以再次点击
+                                },(200));
+                            }
+                        }
+                    });
+                    m++;
+                });
+                num++;
+                if (num==len) {
+                    clearInterval(timer);
+                };
+            },200);
+        }
+
+    }
+    function shake(obj,attr,n,endFn){
+        if(obj.shake)return;
+        obj.shake=true;
+
+        var arr=[];
+        var timer=0;
+        var num=0;
+        var dir=getStyle(obj,attr);
+
+        for(var i=n;i>0;i-=4){
+            arr.push(-i,i);
+        }
+        arr.push(0);
+
+        timer=setInterval(function(){
+            num++;
+            obj.style[attr]=dir+arr[num]+'px';
+            if(num==arr.length){
+                clearInterval(timer);
+                obj.shake=false;
+
+                endFn&&endFn();
+            }
+        },100);
+    }
+    function getStyle(obj,attr){
+        return obj.currentStyle?parseInt(obj.currentStyle[attr]):parseInt(getComputedStyle(obj)[attr]);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>扫雷第二步初中高级</title>
+    <style>
+        body{text-align: center;}
+        #box{border: 5px solid #000;overflow: hidden; width: 500px;height: 400px; position: relative; margin: 10px auto;}
+        #box div{width:19px;height: 19px;border:1px solid #000;position: absolute; background:#fff; }
+        #box div.color{background:red;}
+    </style>
+</head>
+<body>
+<input type="button" value='初级' />
+<input type="button" value='中级' />
+<input type="button" value='高级' />
+<div id='box'></div>
+
+<script>
+    var oBox=document.getElementById('box');
+    var aDiv=oBox.getElementsByTagName('div');
+    var aInp=document.getElementsByTagName('input');
+
+    getNum(50,20,25);
+    aInp[0].onclick=function(){getNum(10,10,10);}
+    aInp[1].onclick=function(){getNum(30,15,15);}
+    aInp[2].onclick=function(){getNum(50,20,25);}
+
+    function getNum(n,t,l){
+        oBox.style.cssText='width:'+l*20+'px;height:'+t*20+'px';
+        //oBox.style.width=l*20+'px';
+        //oBox.style.height=t*20+'px';
+        var str='';
+        for(var i=0;i<t;i++){
+            for(var j=0;j<l;j++){
+                str+='<div style="top:'+i*20+'px;left:'+j*20+'px"></div>';
+            }
+        }
+        oBox.innerHTML=str;
+
+
+        for(var i=0;i<t*l;i++){
+            aDiv[i].className='';
+        }
+        var num=0;
+        var json={};
+        while(num<n){
+            var iNum=Math.round(Math.random()*(t*l-1));   //坑-------
+            if(!json[iNum]){
+                num++;
+                json[iNum]=555;
+                aDiv[iNum].className='color';
+            }
+        }
+    }
+</script>
+</body>
+</html>

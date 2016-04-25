@@ -1,0 +1,560 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>单屏滚动页面</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <link href="css/page.css" rel="stylesheet">
+    <script>
+        // 定义功能函数
+        function $(obj){
+            return document.getElementById(obj);
+        }
+        function viewHeight(){
+            var h = document.documentElement.clientHeight||document.body.clientWidth;
+            return h;
+        }
+        function setCss3(obj,opt){
+            var s ="";
+            try{
+                for(var attr in opt){
+                    s = attr.charAt(0).toUpperCase()+attr.substring(1)
+                    obj.style["webkit"+s]=opt[attr];
+                    obj.style["moz"+s]=opt[attr];
+                    obj.style["o"+s]=opt[attr];
+                    obj.style[attr]=opt[attr];
+                }
+            }catch(e){
+
+            }
+        }
+        function getByClass(clsName,oParent){
+            var arr=[];
+            if(window.getElementsByClassName)return (oParent||document).getElementsByClassName(clsName);
+            var obj = (oParent||document).getElementsByTagName("*");
+            var res = new RegExp("(^|\\s+)"+clsName+"(\\s|$)")
+            for(var i=0;i<obj.length;i++){
+                if(res.test(obj[i].className)){
+                    arr.push(obj[i])
+                }
+            }
+            return arr;
+        };
+        //封装hassClass方法
+        function hasClass(obj, clsName) {
+            obj = (typeof obj == "object") ?obj : document.getElementById("obj");
+            var s = obj.className;
+            var rs = new RegExp("(^|\\s)" + clsName + "(\\s|$)");
+            return rs.test(s);
+        }
+        //封装addClass方法
+        function addClass(obj, clsName) {
+            obj = (typeof obj == "object") ? obj : document.getElementById("obj");
+            if ( !hasClass(obj, clsName) ) {
+                obj.className += " " + clsName;
+            }
+
+        }
+        //封装removeClass方法
+        function removeClass(obj, clsName) {
+            obj = (typeof obj == "object") ? obj : document.getElementById("obj");
+            var s = obj.className;
+            var arr = s.split(" ");
+            var clsArr = clsName.split(" ");
+            for(var j=0;j<clsArr.length;j++){
+                for(var i = 0;i<arr.length;i++){
+                    if(arr[i]==clsArr[j]){
+                        delete  arr[i]
+                    }
+                }
+
+            }
+            obj.className = arr.join(" ")
+        }
+        function getStyle(obj, attr) {
+            return obj.currentStyle ? obj.currentStyle[attr] : getComputedStyle(obj)[attr]
+        }
+        function move(obj, opt,  d, fx,callBack) {
+            clearInterval(obj.timer);
+            var startTime = Date.now()
+            var j = {} //存放 json中需要 运动的属性 j 中存放obj的属性对应的初始值begin 和 总距离count
+            var fx = fx||"linear";
+            for (var attr in opt) {
+                j[attr] = {}
+                if (attr == 'opacity') {
+                    j[attr].b = parseInt(getStyle(obj, 'opacity')) * 100
+                } else if(attr == "scrollTop"){
+                    j[attr].b = document.documentElement.scrollTop||document.body.scrollTop;
+                }else {
+                    j[attr].b = parseInt(getStyle(obj, attr))
+                }
+                j[attr].c = parseInt(opt[attr]) - j[attr].b; //.c : 总距离 count
+            };
+            obj.timer = setInterval(function() {
+                var t = Date.now() - startTime;
+                if (t >= d) t = d;
+                for (var attr in opt) {
+                    var v = Tween[fx](t, j[attr].b, j[attr].c, d) // 运动的方式
+                    if (attr == 'opacity') {
+                        obj.style.opacity = parseFloat(v / 100).toFixed(3);
+                        obj.style.filter = 'alpha(opacity=' + v + ')';
+                    }else if(attr == "scrollTop"){
+                        document.documentElement.scrollTop=document.body.scrollTop=v;
+                    } else {
+                        obj.style[attr] = v + 'px';
+                    }
+                }
+                if (t == d) {
+                    clearInterval(obj.timer);
+                    callBack && callBack();
+                }
+            }, 15)
+
+
+        }
+        /*运动方式
+         t : 已过时间 time            b : 初始位置 begin
+         c : 总距离 count             d : 总时间 duration
+         Tween.linear();
+         */
+        var Tween = {
+            linear: function(t, b, c, d) { //匀速
+                return c * t / d + b;
+            },
+            easeIn: function(t, b, c, d) { //加速曲线
+                return c * (t /= d) * t + b;
+            },
+            easeOut: function(t, b, c, d) { //减速曲线
+                return -c * (t /= d) * (t - 2) + b;
+            },
+            easeBoth: function(t, b, c, d) { //加速减速曲线
+                if ((t /= d / 2) < 1) {
+                    return c / 2 * t * t + b;
+                }
+                return -c / 2 * ((--t) * (t - 2) - 1) + b;
+            }
+        }
+    </script>
+    <script>
+        function checkLoading(){
+            var imgArr = ["about1.jpg","about2.jpg","about3.jpg","about4.jpg","bg1.jpg","bg2.jpg","bg3.jpg","bg4.jpg","robot.png","zoomico.png"],
+                    i = 0,oImg = null,num=0,div1,div2;
+            for(i =1;i<=12;i++){
+                imgArr.push("icon_"+i+".png");
+                if(i<=3){
+                    imgArr.push("plane"+i+".png");
+                }
+                if(i<=4){
+                    imgArr.push("show"+i+".jpg");
+                    imgArr.push("worksimg"+i+".jpg");
+                }
+            };
+            for(i=0;i<imgArr.length;i++){
+                var oImg = new Image();
+                oImg.src="pic/"+imgArr[i];
+                oImg.onload = function(){
+                    num++;
+                    if(num == imgArr.length){
+                        div1 = $("loadingCircle").getElementsByTagName("div")[0];
+                        div2 = $("loadingCircle").getElementsByTagName("div")[1];
+                        move(div1, {top:-viewHeight()/2},500, "easeOut");
+                        move(div2, {top:viewHeight()},500, "easeOut");
+                        move(getByClass("loading1",$("loadingCircle"))[0], {opacity:0},500, "easeOut");
+                        move(getByClass("loading2",$("loadingCircle"))[0], {opacity:0},500, "easeOut",function(){
+                            document.body.removeChild( $("loadingCircle") );
+                        });
+                    }
+                }
+                oImg.onerror = function(){
+                    div1 = $("loadingCircle").getElementsByTagName("div")[0];
+                    div2 = $("loadingCircle").getElementsByTagName("div")[1];
+                    move(div1, {top:-viewHeight()/2},500, "easeOut");
+                    move(div2, {top:viewHeight()},500, "easeOut");
+                    move(getByClass("loading1",$("loadingCircle"))[0], {opacity:0},500, "easeOut");
+                    move(getByClass("loading2",$("loadingCircle"))[0], {opacity:0},500, "easeOut",function(){
+                        document.body.removeChild( $("loadingCircle") );
+                    });
+                }
+            }
+
+        }
+        checkLoading()
+    </script>
+</head>
+<body>
+<div id="loadingCircle">
+    <div></div>
+    <div></div>
+    <ul class="loading1">
+        <li class="arc1"></li>
+        <li class="arc2"></li>
+        <li class="arc3"></li>
+        <li class="arc4"></li>
+    </ul>
+    <ul class="loading2">
+        <li class="arc1"></li>
+        <li class="arc2"></li>
+        <li class="arc3"></li>
+        <li class="arc4"></li>
+    </ul>
+</div>
+<div id="main">
+    <section class="page sec1">
+        <div class="content" id="cont1">
+            <div class="content1">
+                <ul class="banner">
+                    <li class="active"><img src="pic/show1.jpg" alt=""></li>
+                    <li><img src="pic/show2.jpg" alt=""></li>
+                    <li><img src="pic/show3.jpg" alt=""></li>
+                    <li><img src="pic/show4.jpg" alt=""></li>
+                </ul>
+                <ol>
+                    <li class="hover"></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ol>
+            </div>
+        </div>
+    </section>
+    <section class="page sec2">
+        <div id="cont2" class="content">
+            <div class="c2Title">
+                JS+CSS3<br/>翻牌效果
+            </div>
+            <div class="c2Des">运用JavaScript+CSS3打造炫酷的翻牌效果，综合运用了CSS3中的keyframes animation transform rotate scale translate transition perspective preserve-3d等知识点……</div>
+            <ul class="rotateList">
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0001</div>
+                </li>
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0002</div>
+                </li>
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0003</div>
+                </li>
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0004</div>
+                </li>
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0005</div>
+                </li>
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0006</div>
+                </li>
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0007</div>
+                </li>
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0008</div>
+                </li>
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0009</div>
+                </li>
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0010</div>
+                </li>
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0011</div>
+                </li>
+                <li class="rotateIcon">
+                    <div class="beforeIcon"></div>
+                    <div class="afterIcon">perspective preserve 0012</div>
+                </li>
+            </ul>
+            <div class="fly1"></div>
+            <div class="fly2"></div>
+            <div class="fly3"></div>
+        </div>
+    </section>
+    <section class="page sec3">
+        <div class="content" id="cont3">
+            <div class="c3title">
+                运用CSS3制造机器人华丽太空舞
+            </div>
+            <div class="worksMachine"></div>
+            <ul class="c3list">
+                <li><img src="pic/worksimg1.jpg" > <div class="c3mask"><span class="title">keyframes</span><i class="icon"></i></div></li>
+                <li><img src="pic/worksimg2.jpg" ><div class="c3mask"><span class="title">animation</span><i class="icon"></i></div></li>
+                <li><img src="pic/worksimg3.jpg" ><div class="c3mask"><span class="title">transform perspective</span><i class="icon"></i></div></li>
+                <li><img src="pic/worksimg4.jpg" ><div class="c3mask"><span class="title">rotate translate transition</span><i class="icon"></i></div></li>
+            </ul>
+        </div>
+    </section>
+    <section class="page sec4">
+        <div class="content" id="cont4">
+            <div class="c4title">网格算法万花筒般图片展示</div>
+            <div class="c4cont">运用网格算法，配合JS与CSS3的相关知识点：CSS3事件(transitionend)keyframes animation transform rotate scale translate transition perspective preserve-3d等，打造炫酷图片展示效果</div>
+            <ul class="c4list">
+                <li><img src="pic/about2.jpg" alt=""/>
+                    <ol>
+                        <li><img src="pic/about1.jpg" alt=""></li>
+                        <li><img src="pic/about1.jpg" alt=""></li>
+                        <li><img src="pic/about1.jpg" alt=""></li>
+                        <li><img src="pic/about1.jpg" alt=""></li>
+                    </ol>
+                </li>
+                <li><img src="pic/about4.jpg" alt=""/>
+                    <ol>
+                        <li><img src="pic/about3.jpg" alt=""></li>
+                        <li><img src="pic/about3.jpg" alt=""></li>
+                        <li><img src="pic/about3.jpg" alt=""></li>
+                        <li><img src="pic/about3.jpg" alt=""></li>
+                    </ol>
+                </li>
+            </ul>
+        </div>
+    </section>
+    <!-- <section class="page sec5"></section>  -->
+    <aside id="aside">
+        <ul>
+            <li class="hover"></li>
+            <li></li>
+            <li></li>
+            <li></li><!-- 
+            <li></li> -->
+        </ul>
+    </aside>
+</div>
+<script>
+    window.onload = function(){
+        var index,sec,asd,asdLi,oMain,timer,tban;
+        oMain = $("main")
+        index= 0;//页面计数
+        sec  = getByClass("page");//大的分页面
+        asd = $("aside");//侧边栏目
+        asdLi = asd.getElementsByTagName("li");//侧边栏小按钮
+        timer = null;//鼠标滚动的定时器
+        tban=null;//banner的定时器
+        //设置分页高度
+        function setPageHeight(){
+            for(var i=0;i<sec.length;i++){
+                sec[i].style.height = viewHeight()+"px";
+            }
+        }
+        setPageHeight();
+        window.onresize = function(){
+            setPageHeight();
+            oMain.style.top = -viewHeight()*index+"px";
+        }
+        //侧边栏小按钮点击事件
+        function asideSlide(){
+            for(var i=0;i<asdLi.length;i++){
+                (function(i){
+                    asdLi[i].onclick=function(){
+                        for(var j=0;j<asdLi.length;j++){
+                            asdLi[j].className="";
+                        }
+                        asdLi[i].className="hover";
+                        move(oMain,{top: -i*viewHeight()},200,"easeIn")
+                        index =i;
+                        pageEvent[i].inAn()
+                    }
+                })(i)
+            }
+        }
+        asideSlide();
+        // banner
+        var oC1 = $("cont1"),
+                oUl = oC1.getElementsByTagName("ul")[0],
+                aulLi = oUl.getElementsByTagName("li"),
+                oOl = oC1.getElementsByTagName("ol")[0],
+                aolLi=oOl.getElementsByTagName("li"),
+                len=aulLi.length,i=iNow=0,
+                old=aolLi[0];
+
+        function play(num){
+            if(old.index==num)return;
+            for(var i=0;i<len;i++){
+                aulLi[i].className =""
+                aolLi[i].className =""
+            }
+            aolLi[num].className ="hover";
+            if(old.index<num){
+                aulLi[old.index].className ="active hideLeft";
+                aulLi[num].className ="active showRight";
+
+            }else{
+                aulLi[old.index].className ="active hideRight";
+                aulLi[num].className ="active showLeft";
+            }
+            old = aolLi[num];
+            iNow = num;
+        }
+        for(i=0;i<aolLi.length;i++){
+            aolLi[i].index = i;
+            aolLi[i].onclick = function(){
+                play(this.index);
+                return false;
+            }
+        }
+        //tban = setInterval(autoPlay,3500)
+        function autoPlay(){
+            iNow++;
+            if(iNow==len)iNow=0;
+            play(iNow);
+        }
+//每屏事件
+        var pageEvent = [
+            {
+                inAn:function(){
+                    var c1 = $("cont1"),
+                            bnr = c1.getElementsByTagName("ul")[0];
+                    setTimeout(function(){
+                        setCss3(bnr,{transition:".4s",opacity:1,"transform":"translate(0,0)"})
+                        setCss3(oOl,{transition:".4s",opacity:1,"transform":"translate(0,0)"})
+                    },200)
+                    oC1.tban = setInterval(autoPlay,2500);
+
+                    oC1.onmouseover=function(){
+                        clearInterval(oC1.tban);
+                    }
+                    oC1.onmouseout=function(){
+                        oC1.tban= setInterval(autoPlay,2500);
+                    }
+                },
+                outAn:function(){
+                    var  bnr = oC1.getElementsByTagName("ul")[0];
+                    setCss3(bnr,{transition:"",opacity:0,"transform":"translate(0,-120px)"});
+                    setCss3(oOl,{transition:"",opacity:0,"transform":"translate(0,60px)"});
+                    oC1.onmouseover=null;
+                    oC1.onmouseout=null;
+                    clearInterval(oC1.tban);
+                    for(var i=0;i<len;i++){
+                        aulLi[i].className =""
+                        aolLi[i].className =""
+                    }
+                    aolLi[iNow].className ="hover";
+                    aulLi[iNow].className ="active";
+                }
+            },{
+                inAn:function(){
+                    var c2 = $("cont2"),
+                            c2t = getByClass('c2Title',c2)[0],
+                            c2d = getByClass('c2Des',c2)[0],
+                            c2List = getByClass('rotateList',c2)[0],
+                            fly1 = getByClass('fly1',c2)[0],
+                            fly2 = getByClass('fly2',c2)[0],
+                            fly3 = getByClass('fly3',c2)[0];
+                    setTimeout(function(){
+                        setCss3(fly1,{transition:".8s",opacity:1,"transform":"translate(0,0)"})
+                        setCss3(fly2,{transition:".8s",opacity:1,"transform":"translate(0,0)"})
+                        setCss3(fly3,{transition:".8s",opacity:1,"transform":"translate(0,0)"})
+                    },200)
+                },
+                outAn:function(){
+                    var c2 = $("cont2"),
+                            c2t = getByClass('c2Title',c2)[0],
+                            c2d = getByClass('c2Des',c2)[0],
+                            c2List = getByClass('rotateList',c2)[0],
+                            fly1 = getByClass('fly1',c2)[0],
+                            fly2 = getByClass('fly2',c2)[0],
+                            fly3 = getByClass('fly3',c2)[0];
+                    setCss3(fly1,{transition:"",opacity:0,"transform":"translate(-60px,-120px)"})
+                    setCss3(fly2,{transition:"",opacity:0,"transform":"translate(-80px,120px)"})
+                    setCss3(fly3,{transition:"",opacity:0,"transform":"translate(80px,-120px)"})
+                }
+            },{
+                inAn:function(){
+                    var c3 = $("cont3"),
+                            c3t = getByClass('c3title',c3)[0],
+                            c3List = getByClass('c3list',c3)[0];
+                    setTimeout(function(){
+                        setCss3(c3t,{transition:".8s",opacity:1,"transform":"translate(0,0px)"})
+                        setCss3(c3List,{transition:".8s",opacity:1,"transform":"translate(0,0)"})
+                    },200)
+                },
+                outAn:function(){
+                    var c3 = $("cont3"),
+                            c3t = getByClass('c3title',c3)[0],
+                            c3List = getByClass('c3list',c3)[0];
+                    setCss3(c3t,{transition:"",opacity:0,"transform":"translate(0,-200px)"})
+                    setCss3(c3List,{transition:"",opacity:0,"transform":"translate(0,300px)"})
+                }
+            },{
+                inAn:function(){
+                    var c4 = $("cont4"),
+                            c4t = getByClass('c4title',c4)[0],
+                            c4ct = getByClass('c4cont',c4)[0],
+                            c4List = getByClass('c4list',c4)[0];
+                    setTimeout(function(){
+                        setCss3(c4t,{transition:".8s",opacity:1,"transform":"translate(0,0px)"})
+                        setCss3(c4List,{transition:".8s",opacity:1,"transform":"translate(0,0)"})
+                        setCss3(c4ct,{transition:"1.4s",opacity:1})
+                    },200)
+                },
+                outAn:function(){
+                    var c4 = $("cont4"),
+                            c4t = getByClass('c4title',c4)[0],
+                            c4ct = getByClass('c4cont',c4)[0],
+                            c4List = getByClass('c4list',c4)[0];
+                    setCss3(c4t,{transition:"",opacity:0,"transform":"translate(-200px,0)"})
+                    setCss3(c4List,{transition:"",opacity:0,"transform":"translate(300px,0)"})
+                    setCss3(c4ct,{transition:"",opacity:0})
+                }
+            }
+        ];
+        for(i=0;i<pageEvent.length;i++){
+            pageEvent[i].outAn()
+        }
+        //第一个页面事件
+        pageEvent[0].inAn();
+//鼠标事件
+        window.mousewheel_timer = true;
+        function mouseScroll(ev){
+            var ev = ev||window.event;
+            var dir = true;
+            if(!window.mousewheel_timer)return false;
+            window.mousewheel_timer=false;
+            setTimeout(function(){
+                window.mousewheel_timer = true
+            },400)
+            console.log(index)
+            if(ev.wheelDelta){
+                dir = ev.wheelDelta>0?true : false;
+            }else{
+                dir =ev.detail<0?true:false;
+            }
+            if(dir){
+                index--;
+                index=(index<0)?0:index;
+                if(pageEvent[index+1])pageEvent[index+1].outAn()
+                if(pageEvent[index])pageEvent[index].inAn()
+            }else{
+                index++;
+                index=(index==sec.length)?sec.length-1:index;
+                if(pageEvent[index-1])pageEvent[index-1].outAn()
+                if(pageEvent[index])pageEvent[index].inAn()
+            }
+            move(oMain,{top: -index*viewHeight()},200,"easeIn")
+            for(var j=0;j<asdLi.length;j++){
+                asdLi[j].className="";
+            }
+            asdLi[index].className="hover";
+
+        }
+        if(window.attachEvent){
+            document.attachEvent("onmousewheel",mouseScroll)
+        }else{
+            document.addEventListener("mousewheel",mouseScroll,false)
+            document.addEventListener("DOMMouseScroll",mouseScroll,false)
+        };
+    }
+
+</script>
+</body>
+</html>

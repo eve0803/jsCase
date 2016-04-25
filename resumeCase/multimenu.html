@@ -1,0 +1,228 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>多级展开菜单</title>
+    <style>
+        body,ul{margin: 0;padding: 0;}
+        li{list-style: none;}
+        a{text-decoration: none; color: #000; font-size: 18px; height: 24px; line-height: 24px; display: block;}
+        a:hover{color: red;}
+        #ul1{margin: 50px;}
+        ul{position: relative;left: 20px;}
+        #ul1 ul{display: none;}
+    </style>
+    <script>
+        window.onload = function(){
+            var oUl1 = document.getElementById('ul1');
+            var aUl = oUl1.getElementsByTagName('ul');
+
+            var aA = oUl1.getElementsByTagName('a');
+            for(var i=0;i<aA.length;i++){
+                aA[i].onclick=function(){
+                    var oUl = getNext( this );  //a的下一个兄弟节点，即要展开的下一级
+
+                    //获取此li下的所有子孙ul(有问题：同级点关不了。)
+                    //获取此li父级ul下
+                    var siblingsUl = this.parentNode.parentNode.getElementsByTagName('ul');
+
+                    if( oUl ){
+                        if( oUl.style.display == 'block' ){
+                            oUl.style.display = 'none';
+                        }else{
+                            //如果是隐藏的点击，全关，开当前。。如果是的展开，上次点击已经全关了，再点直接关闭即可
+                            /*for(var i=0; i<aUl.length; i++){
+                             aUl[i].style.display = 'none';
+                             } //问题：二级以下无法展开  */
+
+                            for(var i=0; i<siblingsUl.length; i++){
+                                siblingsUl[i].style.display = 'none';
+                            }
+
+                            oUl.style.display = 'block';
+                        }
+                    }
+
+                    var oSpan = this.getElementsByTagName('span')[0];
+                    var aSpan = this.parentNode.parentNode.getElementsByTagName('span');
+
+                    if( oSpan.innerHTML == '-' ){
+                        oSpan.innerHTML = '+';
+
+                    }else{
+                        for(var i=0; i<aSpan.length; i++){
+                            aSpan[i].innerHTML = '+';
+                        }
+
+                        oSpan.innerHTML = '-';
+
+                    }
+
+                }
+            }
+
+            function getNext( obj ){
+                if( !obj || !obj.nextSibling ) return null;
+                return obj.nextSibling.nodeType === 1 ? obj.nextSibling : getNext( obj.nextSibling );
+            }
+        }
+    </script>
+</head>
+<body>
+<ul id="ul1">
+    <li><a href="javascript:;"><span>+</span>第一级菜单</a>
+        <ul>
+            <li><a href="javascript:;"><span>+</span>第二级菜单</a>
+                <ul>
+                    <li><a href="javascript:;"><span>+</span>第三级菜单</a>
+                        <ul>
+                            <li><a href="javascript:;"><span>+</span>第四级菜单</a>
+                                <ul>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                </ul>
+            </li>
+            <li><a href="javascript:;"><span>+</span>第二级菜单</a>
+                <ul>
+                    <li><a href="javascript:;"><span>+</span>第三级菜单</a>
+                        <ul>
+                            <li><a href="javascript:;"><span>+</span>第四级菜单</a>
+                                <ul>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                </ul>
+            </li>
+            <li><a href="javascript:;">第二级菜单</a></li>
+            <li><a href="javascript:;">第二级菜单</a></li>
+        </ul>
+    </li>
+
+    <li><a href="javascript:;"><span>+</span>第一级菜单</a>
+        <ul>
+            <li><a href="javascript:;"><span>+</span>第二级菜单</a>
+                <ul>
+                    <li><a href="javascript:;"><span>+</span>第三级菜单</a>
+                        <ul>
+                            <li><a href="javascript:;"><span>+</span>第四级菜单</a>
+                                <ul>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                </ul>
+            </li>
+            <li><a href="javascript:;"><span>+</span>第二级菜单</a>
+                <ul>
+                    <li><a href="javascript:;"><span>+</span>第三级菜单</a>
+                        <ul>
+                            <li><a href="javascript:;"><span>+</span>第四级菜单</a>
+                                <ul>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                </ul>
+            </li>
+            <li><a href="javascript:;">第二级菜单</a></li>
+            <li><a href="javascript:;"<span>+</span>第二级菜单</a></li>
+        </ul>
+    </li>
+
+    <li><a href="javascript:;"><span>+</span>第一级菜单</a>
+        <ul>
+            <li><a href="javascript:;"><span>+</span>第二级菜单</a>
+                <ul>
+                    <li><a href="javascript:;"><span>+</span>第三级菜单</a>
+                        <ul>
+                            <li><a href="javascript:;"><span>+</span>第四级菜单</a>
+                                <ul>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                </ul>
+            </li>
+            <li><a href="javascript:;"><span>+</span>第二级菜单</a>
+                <ul>
+                    <li><a href="javascript:;"><span>+</span>第三级菜单</a>
+                        <ul>
+                            <li><a href="javascript:;"><span>+</span>第四级菜单</a>
+                                <ul>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                    <li><a href="javascript:;">第五级菜单</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                            <li><a href="javascript:;">第四级菜单</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                    <li><a href="javascript:;">第三级菜单</a></li>
+                </ul>
+            </li>
+            <li><a href="javascript:;">第二级菜单</a></li>
+            <li><a href="javascript:;">第二级菜单</a></li>
+        </ul>
+    </li>
+
+</ul>
+</body>
+</html>

@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title> 图片时钟运动版 </title>
+    <meta charset = 'utf-8' />
+    <style>
+        p{text-align: center; font-size: 30px; font-family: Arial; padding-top: 120px;}
+        ul{margin:20px auto 0;padding:0;width:400px;height:70px;}
+        li{list-style:none;position:relative;width:50px;height:70px;overflow:hidden;float:left;}
+        li div{position:absolute;left:0;top:0;width:50px;height:140px;}
+        li img{float:left;}
+    </style>
+</head>
+<body>
+<p id='p'></p>
+<ul id="box">
+    <li>
+        <div>
+            <img src="img/b.jpg" />
+            <img src="img/b.jpg" />
+        </div>
+    </li>
+    <li>
+        <div>
+            <img src="img/b.jpg" />
+            <img src="img/b.jpg" />
+        </div>
+    </li>
+    <li><img src="img/c.jpg" /></li>
+    <li>
+        <div>
+            <img src="img/b.jpg" />
+            <img src="img/b.jpg" />
+        </div>
+    </li>
+    <li>
+        <div>
+            <img src="img/b.jpg" />
+            <img src="img/b.jpg" />
+        </div>
+    </li>
+    <li><img src="img/c.jpg" /></li>
+    <li>
+        <div>
+            <img src="img/b.jpg" />
+            <img src="img/b.jpg" />
+        </div>
+    </li>
+    <li>
+        <div>
+            <img src="img/b.jpg" />
+            <img src="img/b.jpg" />
+        </div>
+    </li>
+</ul>
+<script type="text/javascript">
+    var oP=document.getElementById('p');
+    var aLi=document.getElementsByTagName('li');
+    setTime();
+    setInterval(setTime,1000);
+    function setTime(){
+        var t=new Date(),h=t.getHours(),m=t.getMinutes(),s=t.getSeconds();
+        var str=addZero(h)+'a'+addZero(m)+'a'+addZero(s);
+        oP.innerHTML=addZero(h)+':'+addZero(m)+':'+addZero(s);
+
+        for(var i=0;i<aLi.length;i++){
+            fn1(aLi[i],i);
+        }
+
+        function fn1(li,i){
+            var oDiv=li.getElementsByTagName('div')[0];
+            var aImg=li.getElementsByTagName('img');
+            if(str.charAt(i)=='a'){               // ' : '特殊字符，最好不要用
+                aImg[0].src='img/c.jpg';
+                setTimeout(function(){
+                    aImg[0].src='img/b.jpg';
+                },500);
+            }else{
+                aImg[1].src='img/'+str.charAt(i)+'.jpg';
+                if(aLi[i].t!=str.charAt(i)) {
+                    doMove(oDiv,function(){
+                        aImg[0].src = aImg[1].src;
+                        oDiv.style.top = 0 + 'px';
+                    });
+                    aLi[i].t=str.charAt(i);
+                }
+            }
+        }
+    }
+    function addZero(n){
+        return n<10?'0'+n:''+n;
+    }
+    function doMove(obj,endFn){
+        var timer = null;
+        var iTop = 0;
+        timer = setInterval(function(){
+            iTop -= 5;
+            if( iTop <= -70 ){
+                iTop = -70;
+                clearInterval(timer);
+            }
+            obj.style.top = iTop + 'px';
+            if( iTop == -70 ){
+                if( typeof endFn === 'function') endFn();
+            }
+        },30);
+    }
+</script>
+</body>
+</html>
