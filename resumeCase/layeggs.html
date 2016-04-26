@@ -12,25 +12,46 @@
 </style>
 <body>
 <input id="btn1" type="button" value="开始" />
-
 <img id="img1" width="208" src="img/1.png" />
 <div id="box"></div>
 <script>
-    var oBtn=document.getElementById('btn1');
-    var oImg=document.getElementById('img1');
-    var oBox=document.getElementById('box');
-    var aImg=oBox.getElementsByTagName('img')
-    var timer=0;
-    var iNow=0;
-    var num=0;
-    oBtn.onclick=function(){
-        this.style.top='-100px';
-        fnAuto();
-
+    (function(){
+        function shake(obj,attr,n,endFn){ //shake( 对象，属性，时间，回调 );   抖动的封装
+            if(obj.shake)return;
+            obj.shake=true;
+            var arr=[];
+            var timer=0;
+            var num=0;
+            var dir=getStyle(obj,attr);
+            for(var i=n;i>0;i-=4){
+                arr.push(-i,i);
+            }
+            arr.push(0);
+            timer=setInterval(function(){
+                num++;
+                obj.style[attr]=dir+arr[num]+'px';
+                if(num==arr.length){
+                    clearInterval(timer);
+                    obj.shake=false;
+                    endFn&&endFn();
+                }
+            },100);
+        }
+        function getStyle(obj,attr){
+            return obj.currentStyle?parseInt(obj.currentStyle[attr]):parseInt(getComputedStyle(obj)[attr]);
+        }
+        var oBtn=document.getElementById('btn1');
+        var oImg=document.getElementById('img1');
+        var oBox=document.getElementById('box');
+        var aImg=oBox.getElementsByTagName('img')
+        var timer=0;
+        var iNow=0;
+        var num=0;
+        var str='';
         function fnAuto(){
             oImg.style.left=iNow*220+'px';
             timer=setTimeout(function(){
-                shake(oImg,'top',10,function(){
+                shake(oImg,'left',10,function(){
                     oBox.innerHTML+='<img src="img/2.png" />'
                     aImg[iNow].style.left=getStyle(oImg,'left')+'px';
                     aImg[iNow].style.top=300+'px';
@@ -48,40 +69,11 @@
             },1000)
 
         }
-
-    }
-
-
-
-    function shake(obj,attr,n,endFn){
-        if(obj.shake)return;
-        obj.shake=true;
-
-        var arr=[];
-        var timer=0;
-        var num=0;
-        var dir=getStyle(obj,attr);
-
-        for(var i=n;i>0;i-=4){
-            arr.push(-i,i);
+        oBtn.onclick=function(){
+            this.style.top='-100px';
+            fnAuto();
         }
-        arr.push(0);
-
-        timer=setInterval(function(){
-            num++;
-            obj.style[attr]=dir+arr[num]+'px';
-            if(num==arr.length){
-                clearInterval(timer);
-                obj.shake=false;
-
-                endFn&&endFn();
-            }
-        },100);
-    }
-    function getStyle(obj,attr){
-        return obj.currentStyle?parseInt(obj.currentStyle[attr]):parseInt(getComputedStyle(obj)[attr]);
-    }
-
+    })();
 </script>
 </body>
 </html>

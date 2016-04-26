@@ -1,15 +1,16 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>表格的添加删除</title>
 </head>
 <style>
-    #table { border: 5px solid #333; margin: 0 auto; }
-    #table td,#table th { width: 200px; text-align: center; border: 1px solid #555; }
-    #table thead { background: yellow;}
+    #table { border: 1px solid #000; margin: 0 auto; collapse: 0; border-collapse:collapse }
+    #table td,#table th { width: 200px;padding: 10px 0; text-align: center; border: 1px solid #555; }
+    #table thead { background: green; color: #fff;}
     #table td a{text-decoration: none;}
     #table td a:hover{color: red;}
+    #table tr:nth-of-type(2n){background:#ccc; }
     #del,#add{height: 24px;margin: 10px;}
     #form1,#div1{width:500px; margin: 0 auto;}
 
@@ -44,133 +45,134 @@
 </body>
 </html>
 <script>
-    var aData = [
-        {'name': '赵一', 'sex': '男', 'age': '35','exp':'有'},
-        {'name': '钱二', 'sex': '女', 'age': '28','exp':'没有'},
-        {'name': '孙三', 'sex': '男', 'age': '15','exp':'有'},
-        {'name': '李四', 'sex': '男', 'age': '48','exp':'有'},
-        {'name': '周五', 'sex': '男', 'age': '36','exp':'没有'},
-        {'name': '武六', 'sex': '女', 'age': '49','exp':'没有'},
-        {'name': '郑七', 'sex': '女', 'age': '75','exp':'有'},
-        {'name': '王九', 'sex': '男', 'age': '17','exp':'有'}
-    ];
-    var oTable=document.getElementById('table'),
-            oTbody=oTable.tBodies[0],
-            aRows=oTbody.rows;
-    var aColor=['#E94F44','#4BB648']
-
-    var oSelectAll=oTable.getElementsByTagName('input')[0];
-    var aCheck=oTbody.getElementsByTagName('input');
-
-    for(var i=0;i<aData.length;i++){
-        var oTr=document.createElement('tr'),
+    (function(){
+        var data = [
+            {'name': '赵一', 'sex': '男', 'age': '35','exp':'有'},
+            {'name': '钱二', 'sex': '女', 'age': '28','exp':'没有'},
+            {'name': '孙三', 'sex': '男', 'age': '15','exp':'有'},
+            {'name': '李四', 'sex': '男', 'age': '48','exp':'有'},
+            {'name': '周五', 'sex': '男', 'age': '36','exp':'没有'},
+            {'name': '武六', 'sex': '女', 'age': '49','exp':'没有'},
+            {'name': '郑七', 'sex': '女', 'age': '75','exp':'有'},
+            {'name': '王九', 'sex': '男', 'age': '17','exp':'有'}
+        ];
+        var oTable=document.getElementById('table'),
+                oTbody=oTable.tBodies[0],
+                aRows=oTbody.rows;
+        var aColor=['#cccccc','#ffffff'];
+        var oSelectAll=oTable.getElementsByTagName('input')[0];
+        var aCheck=oTbody.getElementsByTagName('input');
+        for(var i=0;i<data.length;i++){
+            var oTr=document.createElement('tr'),
                 oTd=document.createElement('td');
-        oTd.innerHTML='<input type="checkbox" />';
-        oTr.appendChild(oTd);
-
-        for(var j in aData[i]){
-            var oTd=document.createElement('td');
-            oTd.innerHTML=aData[i][j];
+            oTd.innerHTML='<input type="checkbox" />';
             oTr.appendChild(oTd);
-        }
 
-        oTr.appendChild(oTd);
-        oTbody.appendChild(oTr);
-    }
-
-
-    fnColor();
-    //隔行变色
-    function fnColor(){
-        for(var i=0;i<aRows.length;i++){
-            aCheck[i].index=i; //1-2
-            if(aCheck[i].checked) continue;
-            aRows[i].style.background=aColor[i%aColor.length];
-        }
-    }
-
-    //点击选择框
-    fnCheck();
-    function fnCheck(){
-        for(var i=0;i<aCheck.length;i++){
-            aCheck[i].index=i;
-            aCheck[i].onclick=function(){
-                var that=this.parentNode.parentNode; //tr
-                that.style.background=this.checked?'#FACE0C':aColor[this.index%aColor.length]; //1-2
-
-                oSelectAll.checked=isChecked();
+            for(var j in data[i]){
+                var oTd=document.createElement('td');
+                oTd.innerHTML=data[i][j];
+                oTr.appendChild(oTd);
             }
-        }
-    }
-    //点击全选框
-    oSelectAll.onclick=function(){
-        for(var i=0;i<aCheck.length;i++){
-            aCheck[i].checked=this.checked;
-            aRows[i].style.background=this.checked?'#FACE0C':aColor[i%aColor.length];
-        }
-    }
 
-    function isChecked(){  //全选判断
-        for(var i=0;i<aCheck.length;i++){
-            if(!aCheck[i].checked) return false;
-        }
-        return true;
-    }
-
-    //选中删除
-    var oDelete=document.getElementById('del');
-    oDelete.onclick=function(){
-        oSelectAll.checked=false;
-        for(var i=0;i<aRows.length;i++){
-            if(aCheck[i].checked){
-                oTbody.removeChild(aRows[i]);
-                i--;
-            }
-        }
-        fnColor();
-    }
-    //添加操作
-    var oForm=document.getElementById('form1');
-    var oAdd=document.getElementById('add');
-
-    oAdd.onclick=function(){
-        var arr=[];
-        arr[0] = oForm.name.value;
-        arr[1] = getChecked(oForm, 'sex');
-        arr[2] = oForm.age.value;
-        arr[3] = getChecked(oForm, 'exp');
-
-        for(var i=0; i<arr.length; i++){
-            if(!arr[i]){
-                alert('你有未填项！');
-                return;
-            }
-        }
-        var oTr = document.createElement('tr');
-        var oTd = document.createElement('td');
-        oTd.innerHTML = '<input type="checkbox" />';
-        oTr.appendChild(oTd);
-
-        for(var i=0; i<arr.length; i++){
-            var oTd = document.createElement('td');
-            oTd.innerHTML = arr[i];
             oTr.appendChild(oTd);
+            oTbody.appendChild(oTr);
         }
 
-        oTbody.appendChild(oTr);
-        //oForm.reset();
-        fnColor();
+
+       // fnColor();
+        //隔行变色
+        function fnColor(){
+            for(var i=0;i<aRows.length;i++){
+                aCheck[i].index=i; //1-2
+                if(aCheck[i].checked) continue;
+                aRows[i].style.background=aColor[i%aColor.length];
+            }
+        }
+
+        //点击选择框
         fnCheck();
-    }
-    function getChecked(form, name){
-        var arr=[];
-        for(var i=0; i<form[name].length; i++){
-            if(form[name][i].checked){
-                arr.push(form[name][i].value);
+        function fnCheck(){
+            for(var i=0;i<aCheck.length;i++){
+                aCheck[i].index=i;
+                aCheck[i].onclick=function(){
+                    var that=this.parentNode.parentNode; //tr
+                    that.style.background=this.checked?'#FACE0C':aColor[this.index%aColor.length]; //1-2
+
+                    oSelectAll.checked=isChecked();
+                }
             }
         }
-        if(form[name][0].type=='radio'){
-            return arr[0];
+        //点击全选框
+        oSelectAll.onclick=function(){
+            for(var i=0;i<aCheck.length;i++){
+                aCheck[i].checked=this.checked;
+                aRows[i].style.background=this.checked?'#FACE0C':aColor[i%aColor.length];
+            }
         }
-    }
+
+        function isChecked(){  //全选判断
+            for(var i=0;i<aCheck.length;i++){
+                if(!aCheck[i].checked) return false;
+            }
+            return true;
+        }
+
+        //选中删除
+        var oDelete=document.getElementById('del');
+        oDelete.onclick=function(){
+            oSelectAll.checked=false;
+            for(var i=0;i<aRows.length;i++){
+                if(aCheck[i].checked){
+                    oTbody.removeChild(aRows[i]);
+                    i--;
+                }
+            }
+            fnColor();
+        }
+        //添加操作
+        var oForm=document.getElementById('form1');
+        var oAdd=document.getElementById('add');
+
+        oAdd.onclick=function(){
+            var arr=[];
+            arr[0] = oForm.name.value;
+            arr[1] = getChecked(oForm, 'sex');
+            arr[2] = oForm.age.value;
+            arr[3] = getChecked(oForm, 'exp');
+
+            for(var i=0; i<arr.length; i++){
+                if(!arr[i]){
+                    alert('你有未填项！');
+                    return;
+                }
+            }
+            var oTr = document.createElement('tr');
+            var oTd = document.createElement('td');
+            oTd.innerHTML = '<input type="checkbox" />';
+            oTr.appendChild(oTd);
+
+            for(var i=0; i<arr.length; i++){
+                var oTd = document.createElement('td');
+                oTd.innerHTML = arr[i];
+                oTr.appendChild(oTd);
+            }
+
+            oTbody.appendChild(oTr);
+            //oForm.reset();
+            fnColor();
+            fnCheck();
+        }
+        function getChecked(form, name){
+            var arr=[];
+            for(var i=0; i<form[name].length; i++){
+                if(form[name][i].checked){
+                    arr.push(form[name][i].value);
+                }
+            }
+            if(form[name][0].type=='radio'){
+                return arr[0];
+            }
+        }
+    })();
+
 </script>
